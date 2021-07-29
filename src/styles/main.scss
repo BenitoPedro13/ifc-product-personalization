@@ -1,0 +1,102 @@
+
+$font-primary: 'Arca Majora 3';
+$font-medium: 15px;
+$color-primary: #4D12A1;
+
+#btn-product-personalization {
+    display: flex;
+    justify-content: center;
+    font-family: $font-primary;
+    font-style: normal;
+    font-weight: bold;
+    font-size: $font-medium;
+    line-height: 19px;
+    text-transform: uppercase;
+    color: $color-primary;
+    padding: 21px 133px;
+    margin: 0 164px 10px 0;
+    border: 1px solid $color-primary;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: opacity .2s;
+    &:hover {
+        opacity: .7;
+    }
+}
+.pnz-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+    opacity: 0;
+    transition: opacity .15s linear;
+    .pnz-modal-dialog {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: auto;
+        pointer-events: auto;
+        background-color: #fff;
+        background-clip: padding-box;
+        outline: 0;
+        max-height: 95%;
+        overflow: auto;
+        box-shadow: 11px 16px 45px rgb(36 14 56 / 30%);
+    }
+}
+
+.pnz-modal-personalization-details {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+    .pnz-modal-options, .pnz-modal-preview {
+        width: 50%;
+    }
+    .pnz-modal-options {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.pnz-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    opacity: 0;
+    transition: opacity .15s linear;
+}
+
+@media (min-width: 576px) {
+    .pnz-modal-dialog {
+        max-width: 100%;
+        margin: 1.75rem auto;
+    }
+}
+
+@media (min-width: 786px) {
+    .pnz-modal-dialog {
+        max-width: 700px;
+        margin: 1.75rem auto;
+    }
+}
+
+@media (min-width: 1196px) {
+    .pnz-modal-dialog {
+        max-width: 1110px;
+        margin: 1.75rem auto;
+    }
+}
