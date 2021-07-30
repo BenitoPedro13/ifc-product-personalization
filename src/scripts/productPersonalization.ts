@@ -1,3 +1,4 @@
+import { addToCart } from './helpers/cart';
 import { slugify } from './helpers/str';
 
 type Type = "text-to-personalization" | "radio-button" | "select" | "checkbox" | "information"
@@ -18,10 +19,20 @@ interface IButton {
     class?: string[]
 }
 
+interface IAttachments {
+    "name": string,
+    "content": any
+}
+interface IObeservers {
+    beforeAddToCart?(textElement: JQuery<HTMLElement>): void,
+    afterAddToCart?(): void
+}
+
 interface IProps {
     options: IOptions[]
     btnShowModal?: IButton
     terms?: string
+    observers?: IObeservers
 }
 
 export default class ProductPersonalization {
@@ -29,16 +40,18 @@ export default class ProductPersonalization {
     product: any;
     btnShowModal: IButton;
     terms: string;
+    observers: IObeservers;
     modalId = 'personalizationProductModal';
     buttonShowModalId = 'btn-product-personalization';
     $modal: JQuery<HTMLElement>;
     $textPersonalization: JQuery<HTMLElement>;
     
     constructor(props: IProps) {
-        const { options, btnShowModal, terms } = props;
+        const { options, btnShowModal, terms, observers } = props;
         this.options = options;
         this.btnShowModal = btnShowModal;
         this.terms = terms ?? 'Assinale para prosseguir, ciente que produtos Pernod personalizados não podem ser devolvidos para troca ou reembolso.';
+        this.observers = observers;
     }
 
     init() {
@@ -54,7 +67,7 @@ export default class ProductPersonalization {
         })
     }
 
-    createButtonShowModal() {
+    private createButtonShowModal() {
         const $button = $(`<div id="${this.buttonShowModalId}">${this.btnShowModal?.text ?? 'Personalize'}</div>`);
         $button.on('click', () => {
             this.$modal.show(300);
@@ -78,7 +91,7 @@ export default class ProductPersonalization {
         }
     }
 
-    createModal() {
+    private createModal() {
         const img = this.product?.items[0]?.images ?? [];
         const imgSrc = img.length>0 ? (img[0]?.imageUrl ?? '') : '';
         const options = this.getOptionsElements();
@@ -148,7 +161,7 @@ export default class ProductPersonalization {
         this.$modal = $modal;
     }
 
-    events() {
+    private events() {
         type IEvent = "show" | "hide";
         $.each(['show', 'hide'], function (i, ev: IEvent) {
             var el = $.fn[ev];
@@ -170,7 +183,35 @@ export default class ProductPersonalization {
 
         this.$modal.on('click', '.btn-close', () => {
             this.$modal.hide();
+        });
+
+        $(document).on('click', '#btn-personalization-add-to-cart', async () => {
+            if (!(this.product?.items.length > 0)) {
+                $('#btn-personalization-add-to-cart').text('Item indisponível').css('cursor', 'default').css('opacity', '.7');
+                return;
+            }
+            let attachments = [{
+                name: "gravacao",
+                content: {
+                    "gravacao": this.$textPersonalization,
+                    "lateralidade": this.$modal.find('[name="lateralidade"]').val() ?? "destro",
+                    "posicao": this.$modal.find('[name="posicao"]').val() ?? "tampa",
+                    "tipografia": this.$modal.find('[name="tipografia"]').val() ?? "SCRIPT 412 1 LINHA"
+                }
+            }]
+            this.observers.beforeAddToCart(this.$textPersonalization);
+            let itemId = this.product?.items[0]?.itemId;
+            let sellerId = this.product?.items[0]?.sellers[0]?.sellerId ?? 1;
+            let isAdded = await addToCart(itemId, 1, sellerId);
+            if (isAdded) {
+                this.$modal.hide();
+            }
+            this.observers.afterAddToCart();
         })
+    }
+
+    private submitPersonalization() {
+
     }
 
     async getProductDetails() {
@@ -225,7 +266,11 @@ export default class ProductPersonalization {
                     console.log($parentOptionType);
                     $($parentOptionType).on('keyup', 'input', function() {
                         let text = $(this).val().toString();
-                        console.log(text);
+                        $('.pnz-text-content').text(text);
+                        option.callback(text, $textPersonalization);
+                    });
+                    $('#pnz-text-to-personalization-btn').on('click', () => {
+                        let text = $($parentOptionType).val().toString();
                         $('.pnz-text-content').text(text);
                         option.callback(text, $textPersonalization);
                     });

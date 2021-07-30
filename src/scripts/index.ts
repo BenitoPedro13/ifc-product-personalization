@@ -26,6 +26,7 @@ const $productPersonalization = new ProductPersonalization({
         },
         {
             title: 'Escolha a tipografia',
+            name: 'tipografia',
             type: 'radio-button',
             options: [
                 $('<span class="pnz-snellroundhand" data-value="snell-roundhand" data-checked="true">Snell Roundhand</span>')

@@ -40,10 +40,11 @@ module.exports = {
       },
       {
         test: /\.(sa|sc|c)ss$/,
+        exclude: /src\/fonts/,
         use: [
-        MiniCssExtractPlugin.loader,
-         'css-loader',
-         'sass-loader'
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader'
         ]
       },
     ],
