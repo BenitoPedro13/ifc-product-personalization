@@ -226,7 +226,7 @@ export default class ProductPersonalization {
             content: {
                 "gravacao": this.$textPersonalization.text(),
                 "lateralidade": this.$modal.find('[name="lateralidade"]').val() ?? "destro",
-                "posicao": this.$modal.find('[name="posicao"]').val() ?? "tampa",
+                "posicao": this.$modal.find('[name="posicao"]').val() ?? "garrafa",
                 "tipografia": this.$modal.find('[name="tipografia"]').val() ?? "SCRIPT 412 1 LINHA"
             }
         }]
