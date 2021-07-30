@@ -20,8 +20,8 @@ const $productPersonalization = new ProductPersonalization({
             title: 'Posição na garrafa',
             type: 'information',
             options: [
-                'Texto somente da parte frontal da garrafa (acima ou abaixo do rótulo)',
-                '<span class="description">Máximo XX caracteres</span>'
+                '<strong>Texto somente da parte frontal da garrafa (acima ou abaixo do rótulo)</strong>',
+                'Máximo XX caracteres'
             ]
         },
         {
@@ -32,6 +32,11 @@ const $productPersonalization = new ProductPersonalization({
                 $('<span data-value="times">J. F. Winter</span>'),
                 $('<span data-value="touchew03-medium">J. F. Winter</span>')
             ]
+        },
+        {
+            title: 'Escreva a sua gravação',
+            type: 'text-to-personalization',
+            options: ['Escreva aqui']
         }
     ]
 });

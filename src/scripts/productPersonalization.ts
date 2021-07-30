@@ -1,6 +1,6 @@
 import { slugify } from './helpers/str';
 
-type Type = "radio-button" | "select" | "checkbox" | "information"
+type Type = "text-to-personalization" | "radio-button" | "select" | "checkbox" | "information"
 type Locale = "after" | "before" | "innerHeader" | "innerFooter"
 
 interface IOptions {
@@ -21,22 +21,24 @@ interface IButton {
 interface IProps {
     options: IOptions[]
     btnShowModal?: IButton
-    terms?: string[]
+    terms?: string
 }
 
 export default class ProductPersonalization {
     options: IOptions[];
     product: any;
     btnShowModal: IButton;
+    terms: string;
     modalId = 'personalizationProductModal';
     buttonShowModalId = 'btn-product-personalization';
     $modal: JQuery<HTMLElement>;
     $textPersonalization: JQuery<HTMLElement>;
     
     constructor(props: IProps) {
-        const { options, btnShowModal } = props;
+        const { options, btnShowModal, terms } = props;
         this.options = options;
         this.btnShowModal = btnShowModal;
+        this.terms = terms ?? 'Assinale para prosseguir, ciente que produtos Pernod personalizados não podem ser devolvidos para troca ou reembolso.';
     }
 
     init() {
@@ -88,13 +90,13 @@ export default class ProductPersonalization {
                         <div class="pnz-modal-options">
                             ${options.html()}
                         </div>
-                        <div class="pnz-modal-preview">
-                            <img src="${imgSrc}" alt="${this.product?.productTitle ?? 'Pernod'}">
+                        <div class="pnz-modal-preview" style="background-image: url(${imgSrc})">
+                            <span class="pnz-text-content"></span>
                         </div>
                     </div>
-                    <div class="pnz-modal-product-details">
+                    <div class="pnz-modal-product">
                         <div class="pnz-modal-title">Produto selecionado</div>
-                        <div class="d-flex">
+                        <div class="pnz-modal-product-details">
                             <div class="col-md-3">
                                 <img src="${imgSrc}" alt="${this.product?.productTitle ?? 'Pernod'}">
                             </div>
@@ -105,13 +107,13 @@ export default class ProductPersonalization {
                                 </div>
                                 <div class="pnz-product-personalization-description">
                                     <p>Personalizado com o nome:</p>
-                                    <p class="pnz-text-content"></p>
+                                    <p class="pnz-text-content">-</p>
                                 </div>
                                 <div class="pnz-product-footer">
-                                    <div class="pnz-termos">
-                                        <input type="checkbox" id="termos-personalization">
-                                        <label class="termos" for="termos-personalization">
-                                        Assinale para prosseguir, ciente que produtos Pernod personalizados não podem ser devolvidos para troca ou reembolso.
+                                    <div class="pnz-terms">
+                                        <input type="checkbox" id="pnz-terms-personalization">
+                                        <label for="pnz-terms-personalization">
+                                            ${this.terms}
                                         </label>
                                     </div>
                                 </div>
@@ -179,18 +181,18 @@ export default class ProductPersonalization {
         const fnAddOption = (
             element: JQuery<HTMLElement>,
             option: IOptions,
-            call:(value: string,title: string | JQuery<HTMLElement>) => JQuery<HTMLElement>
+            call:(value: string,title: string | JQuery<HTMLElement>, key: number) => JQuery<HTMLElement>
         ): JQuery<HTMLElement> => {
             option.options.map((opt, key) => {
                 let value = typeof opt === 'object' ? opt.attr('data-value') : opt;
                 opt = typeof opt === 'object' ? opt.html() : opt;
-                let $button = call(value,opt);
+                let $button = call(value,opt,key);
                 element.append($button);
             });
             return element;
         }
         let $textPersonalization = this.$textPersonalization;
-        let $parentOptionType;
+        let $parentOptionType: JQuery;
         this.options.map((option) => {
             if (!option.callback) {
                 option.callback = () => {};
@@ -199,16 +201,29 @@ export default class ProductPersonalization {
             $optionParent.append($(`<div class="pnz-modal-option-title">${option.title}</div>`));
             let name = option.name ?? slugify(option.title) ?? '';
             switch (option.type) {
+                case 'text-to-personalization':
+                    if ($optionsHTML.find('input#pnz-text-to-personalization').length>0) {
+                        return;
+                    }
+                    $parentOptionType = fnAddOption($(`<div></div>`), option, (value, title) => {
+                        return $(`<input type="text" id="pnz-text-to-personalization" name="${name}" placeholder="${title}"/>`);
+                    });
+                    $parentOptionType.find('input[type="radio"]').on('keypress', function() {
+                        let text = $(this).val().toString();
+                        $('.pnz-text-content').text(text);
+                        option.callback(text, $textPersonalization);
+                    });
+                    break;
                 case 'radio-button':
-                    $parentOptionType = fnAddOption($(`<ul></ul>`), option, (value, title) => {
-                        return $(`<li><input type="radio" id="${name}" name="${name}" value="${value}" /><label for="${name}">${title}</label></li>`);
+                    $parentOptionType = fnAddOption($(`<ul class="pnz-radio-button"></ul>`), option, (value, title, key) => {
+                        return $(`<li><input type="radio" id="${name}-${key}" name="${name}" value="${value}" /><label for="${name}-${key}">${title}</label></li>`);
                     });
                     $parentOptionType.find('input[type="radio"]').on('change', function() {
                         option.callback($(this).val().toString(), $textPersonalization);
                     });
                     break;
                 case 'select':
-                    $parentOptionType = fnAddOption($(`<select name="${name}"></select>`), option, (value, title) => {
+                    $parentOptionType = fnAddOption($(`<select class="pnz-select" name="${name}"></select>`), option, (value, title) => {
                         return $(`<option value="${value}">${title}</option>`);
                     });
                     $parentOptionType.on('change', function() {
@@ -216,7 +231,7 @@ export default class ProductPersonalization {
                     });
                     break;
                 case 'checkbox':
-                    $parentOptionType = fnAddOption($(`<ul></ul>`), option, (value, title) => {
+                    $parentOptionType = fnAddOption($(`<ul class="pnz-checkbox"></ul>`), option, (value, title) => {
                         return $(`<li><input type="checkbox" name="${name}[${value}]" value="yes">${title}</option></li>`);
                     });
                     $parentOptionType.find(`input[type="checkbox"]`).on('change', function() {
@@ -224,7 +239,7 @@ export default class ProductPersonalization {
                     });
                     break;
                 case 'information':
-                    $parentOptionType = fnAddOption($(`<div></div>`), option, (value, title) => {
+                    $parentOptionType = fnAddOption($(`<div class="pnz-information"></div>`), option, (value, title) => {
                         return $(`<p>${title}</p>`);
                     })
                     break;
