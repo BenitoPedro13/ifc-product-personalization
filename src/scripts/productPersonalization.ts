@@ -85,13 +85,15 @@ export default class ProductPersonalization {
         const $modal = $(`
         <div id="${this.modalId}" class="pnz-modal" tabindex="-1">
             <div class="pnz-modal-dialog">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar">&times;</button>
                 <div class="pnz-modal-content">
                     <div class="pnz-modal-personalization-details">
-                        <div class="pnz-modal-options">
-                            ${options.html()}
-                        </div>
-                        <div class="pnz-modal-preview" style="background-image: url(${imgSrc})">
-                            <span class="pnz-text-content"></span>
+                        <div class="pnz-modal-options"></div>
+                        <div class="pnz-modal-preview">
+                            <div style="background-image: url(${imgSrc})">
+                                <span class="pnz-text-content"></span>
+                            </div>
+                            <p>Imagem meramente ilustrativa.</p>
                         </div>
                     </div>
                     <div class="pnz-modal-product">
@@ -126,6 +128,7 @@ export default class ProductPersonalization {
                 </div>
             </div>
         </div>`);
+        $modal.find('.pnz-modal-options').append(options);
         const $modalBack = $(`<div class="pnz-modal-backdrop"></div>`);
         $modal.on('show', (event) => {
             event.preventDefault();
@@ -157,6 +160,16 @@ export default class ProductPersonalization {
 	    
         $(document).on('click', '#btn-personalization-add-to-cart', () => {
             console.log('finalizar');
+        });
+
+        $(document).on('keyup', (event) => {
+            if(event.key === "Escape") {
+                this.$modal.hide();
+            }
+        });
+
+        this.$modal.on('click', '.btn-close', () => {
+            this.$modal.hide();
         })
     }
 
@@ -181,12 +194,13 @@ export default class ProductPersonalization {
         const fnAddOption = (
             element: JQuery<HTMLElement>,
             option: IOptions,
-            call:(value: string,title: string | JQuery<HTMLElement>, key: number) => JQuery<HTMLElement>
+            call:(value: string,title: string | JQuery<HTMLElement>, key?: number, checked?: string) => JQuery<HTMLElement>
         ): JQuery<HTMLElement> => {
             option.options.map((opt, key) => {
                 let value = typeof opt === 'object' ? opt.attr('data-value') : opt;
+                let checked = typeof opt === 'object' && opt.attr('data-checked')=='true' ? 'checked' : '';
                 opt = typeof opt === 'object' ? opt.html() : opt;
-                let $button = call(value,opt,key);
+                let $button = call(value,opt,key,checked);
                 element.append($button);
             });
             return element;
@@ -205,20 +219,22 @@ export default class ProductPersonalization {
                     if ($optionsHTML.find('input#pnz-text-to-personalization').length>0) {
                         return;
                     }
-                    $parentOptionType = fnAddOption($(`<div></div>`), option, (value, title) => {
-                        return $(`<input type="text" id="pnz-text-to-personalization" name="${name}" placeholder="${title}"/>`);
+                    $parentOptionType = fnAddOption($(`<div id="pnz-text-to-personalization"></div>`), option, (value, title) => {
+                        return $(`<input type="text" name="${name}" placeholder="${title}"/><span id="pnz-text-to-personalization-btn"></span>`);
                     });
-                    $parentOptionType.find('input[type="radio"]').on('keypress', function() {
+                    console.log($parentOptionType);
+                    $($parentOptionType).on('keyup', 'input', function() {
                         let text = $(this).val().toString();
+                        console.log(text);
                         $('.pnz-text-content').text(text);
                         option.callback(text, $textPersonalization);
                     });
                     break;
                 case 'radio-button':
-                    $parentOptionType = fnAddOption($(`<ul class="pnz-radio-button"></ul>`), option, (value, title, key) => {
-                        return $(`<li><input type="radio" id="${name}-${key}" name="${name}" value="${value}" /><label for="${name}-${key}">${title}</label></li>`);
+                    $parentOptionType = fnAddOption($(`<ul class="pnz-radio-button"></ul>`), option, (value, title, key, checked) => {
+                        return $(`<li><input type="radio" id="${name}-${key}" name="${name}" value="${value}" ${checked}/><label for="${name}-${key}">${title}</label></li>`);
                     });
-                    $parentOptionType.find('input[type="radio"]').on('change', function() {
+                    $parentOptionType.on('change', 'input[type="radio"]', function() {
                         option.callback($(this).val().toString(), $textPersonalization);
                     });
                     break;
@@ -231,10 +247,10 @@ export default class ProductPersonalization {
                     });
                     break;
                 case 'checkbox':
-                    $parentOptionType = fnAddOption($(`<ul class="pnz-checkbox"></ul>`), option, (value, title) => {
-                        return $(`<li><input type="checkbox" name="${name}[${value}]" value="yes">${title}</option></li>`);
+                    $parentOptionType = fnAddOption($(`<ul class="pnz-checkbox"></ul>`), option, (value, title, key, checked) => {
+                        return $(`<li><input type="checkbox" name="${name}[${value}]" value="yes" ${checked}>${title}</option></li>`);
                     });
-                    $parentOptionType.find(`input[type="checkbox"]`).on('change', function() {
+                    $parentOptionType.on('change', 'input[type="checkbox"]', function() {
                         option.callback($(this).is('checked') ? 'yes' : 'no', $textPersonalization);
                     });
                     break;

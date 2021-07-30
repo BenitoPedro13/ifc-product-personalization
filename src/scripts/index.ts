@@ -28,9 +28,7 @@ const $productPersonalization = new ProductPersonalization({
             title: 'Escolha a tipografia',
             type: 'radio-button',
             options: [
-                $('<span data-value="snell-roundhand">J. F. Winter</span>'),
-                $('<span data-value="times">J. F. Winter</span>'),
-                $('<span data-value="touchew03-medium">J. F. Winter</span>')
+                $('<span class="pnz-snellroundhand" data-value="snell-roundhand" data-checked="true">Snell Roundhand</span>')
             ]
         },
         {
