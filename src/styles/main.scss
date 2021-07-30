@@ -1,22 +1,21 @@
 @font-face {
     font-family: "Snell Roundhand";
     src: url(../fonts/SnellRoundhand.ttf.css) format("truetype");
-    font-weight: normal;
 }
 @font-face {
-    font-family: "Snell Roundhand";
+    font-family: "Snell Roundhand-Bold";
     src: url(../fonts/SnellRoundhand-Bold.ttf.css) format("truetype");
-    font-weight: bold;
 }
 @font-face {
-    font-family: "Snell Roundhand";
+    font-family: "Snell Roundhand-Black";
     src: url(../fonts/SnellRoundhand-Black.ttf.css) format("truetype");
-    font-weight: 900;
 }
 
 $font-primary: "Arca Majora 3";
 $font-secondary: "ToucheW03-Medium";
 $font-personalization-0: "Snell Roundhand", sans-serif;
+$font-personalization-1: "Snell Roundhand-Bold", sans-serif;
+$font-personalization-2: "Snell Roundhand-Black", sans-serif;
 
 $font-medium: 15px;
 $font-large: 20px;
@@ -25,19 +24,18 @@ $color-primary: #4d12a1;
 $color-secondary: #fff;
 
 #btn-product-personalization {
-    display: flex;
-    justify-content: center;
+    display: block;
     font-family: $font-primary;
-    font-style: normal;
     font-weight: bold;
+    text-align: center;
     font-size: $font-medium;
     line-height: 19px;
     text-transform: uppercase;
     color: $color-primary;
-    padding: 21px 133px;
-    margin: 0 164px 10px 0;
+    padding: 21px 0;
+    margin: 10px 0;
     border: 1px solid $color-primary;
-    width: 100%;
+    width: 320px;
     box-sizing: border-box;
     letter-spacing: 3px;
     cursor: pointer;
@@ -127,6 +125,7 @@ $color-secondary: #fff;
 
 .pnz-modal-personalization-details {
     display: flex;
+    position: relative;
     flex: 1;
     flex-wrap: wrap;
     justify-content: center;
@@ -142,6 +141,8 @@ $color-secondary: #fff;
         }
         .pnz-radio-button {
             display: flex;
+            flex: 1;
+            flex-wrap: wrap;
             li {
                 margin: 0 14px 9px 3px;
             }
@@ -158,7 +159,7 @@ $color-secondary: #fff;
         label {
             display: inline-block;
             background-color: transparent;
-            padding: 6px 28px;
+            padding: 6px 20px;
             font-family: sans-serif, Arial;
             font-size: 16px;
             border: 1px solid #000;
@@ -167,7 +168,7 @@ $color-secondary: #fff;
         #pnz-text-to-personalization {
             display: flex;
             input {
-                max-width: 600px;
+                max-width: 100%;
                 border-radius: 0;
                 padding: 12px;
                 padding-right: 70px;
@@ -188,16 +189,23 @@ $color-secondary: #fff;
         input[type="radio"][value="snell-roundhand"] + label {
             font-family: $font-personalization-0;
         }
+        input[type="radio"][value="snell-roundhand-black"] + label {
+            font-family: $font-personalization-1;
+        }
+        input[type="radio"][value="snell-roundhand-bold"] + label {
+            font-family: $font-personalization-2;
+        }
     }
 }
 
 .pnz-modal-preview {
+    height: 320px;
     & > div {
         position: relative;
         width: 100%;
         height: 95%;
         background-repeat: no-repeat;
-        background-size: contain;
+        background-size: cover;
         background-position: center;
     }
     p {
@@ -210,7 +218,9 @@ $color-secondary: #fff;
         position: absolute;
         width: 100%;
         text-align: center;
-        top: 75px;
+        top: calc(50% - 10px);
+        font-size: 32px;
+        text-shadow: 0px 2.17647px 2.17647px rgb(0 0 0 / 25%);
     }
 }
 
@@ -228,12 +238,14 @@ $color-secondary: #fff;
 
 .pnz-modal-product-details {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-end;
     margin-top: 25px;
-    .col-md-3 {
+    .pnz-product-image,
+    .pnz-product-add-to-cart {
         width: 25%;
     }
-    .col-md-6 {
+    .pnz-product-information {
         width: 50%;
     }
     img {
@@ -268,12 +280,17 @@ $color-secondary: #fff;
     color: $color-secondary;
     padding: 10px 0;
     width: 234px;
+    max-width: 100%;
     box-sizing: border-box;
     cursor: pointer;
     transition: opacity 0.2s;
     margin: 0 0 6px 12px;
     &:hover {
         opacity: 0.7;
+    }
+    &.pnz-btn-disabled {
+        opacity: 0.7;
+        cursor: default;
     }
 }
 
@@ -289,14 +306,60 @@ $color-secondary: #fff;
     transition: opacity 0.15s linear;
 }
 
-@media (min-width: 576px) {
+@media (max-width: 560px) {
     .pnz-modal-dialog {
-        max-width: 100%;
+        width: 100%;
+        height: 100%;
         margin: 1.75rem auto;
+    }
+    .pnz-modal-preview {
+        & > div {
+            background-size: cover!important;
+        }
     }
 }
 
-@media (min-width: 786px) {
+@media (max-width: 767px) {
+    #btn-product-personalization {
+        width: 100%;
+    }
+    .pnz-modal-options,
+    .pnz-modal-preview {
+        width: 100%!important;
+    }
+    .posicao-na-garrafa {
+        padding-bottom: 320px;
+        height: 450px;
+    }
+    .pnz-modal-preview {
+        position: absolute;
+        top: 130px;
+        height: 320px;
+        & > div {
+            background-size: contain;
+        }
+        p {
+            padding-right: 25px;
+        }
+    }
+    .pnz-modal-product-details {
+        .pnz-product-image {
+            width: 50%;
+        }
+        .pnz-product-information {
+            width: 50%;
+        }
+        .pnz-product-add-to-cart {
+            width: 100%;
+            #btn-personalization-add-to-cart {
+                margin-top: 25px;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (min-width: 768px) {
     .pnz-modal-dialog {
         max-width: 700px;
         margin: 1.75rem auto;

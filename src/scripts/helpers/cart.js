@@ -26,18 +26,19 @@ export async function addToCart(id, quantity, seller, attachments) {
 export async function itemAddAttachments(id, attachments) {
     let index = getItemIndex(id);
     if (index) {
-        let attachmentOfferingsNames = window.API.orderForm.items[index].attachmentOfferings.map(att => att.name);
-        attachments.map(attachment => {
+        let attachmentOfferingsNames = vtexjs.checkout.orderForm.items[index].attachmentOfferings.map(att => att.name);
+        await attachments.map(async attachment => {
             if (attachmentOfferingsNames.includes(attachment.name)) {
                 await vtexjs.checkout.addItemAttachment(index, attachment.name, attachment.content, null, false);
             }
         });
+        return true;
     }
     return false;
 }
 
 export function getItemIndex(id) {
-    for (const [index, item] of window.API.orderForm.items.entries()) {
+    for (const [index, item] of vtexjs.checkout.orderForm.items.entries()) {
         if (item.id == id) {
             return index;
         }
