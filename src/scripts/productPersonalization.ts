@@ -1,3 +1,4 @@
+import { trim } from 'jquery';
 import { addToCart } from './helpers/cart';
 import { slugify } from './helpers/str';
 
@@ -42,6 +43,7 @@ export default class ProductPersonalization {
     $modal: JQuery<HTMLElement>;
     $textPersonalization: JQuery<HTMLElement>;
     textMaxLength: number;
+    textPreviewDetails: any;
     
     constructor(props: IProps) {
         const { options, btnShowModal, terms, observers } = props;
@@ -55,10 +57,37 @@ export default class ProductPersonalization {
         document.addEventListener("DOMContentLoaded", async (event) => {
             this.product = await this.getProductDetails();
             if (!this.product.length) {
+                console.warn('Dados do produto não encontrados!');
                 return;
             } else if ((this.product['personalize-text-photo-status'] && this.product['personalize-text-photo-status'][0] !== "Sim")) {
+                if (this.product['personalize-text-photo-status'][0] == "Não") {
+                    console.warn(`O valor de "personalize-text-photo-status" deve ser "Sim" ou "Não"`);
+                }
                 return;
             }
+            let image = this.product['personalize-text-photo-url'];
+            image = image ? '/arquivos/'+image[0] : null;
+            let textPosition = this.product['personalize-text-photo-position'];
+            textPosition = textPosition ? textPosition[0] : null;
+            let color = this.product['personalize-text-photo-color'];
+            color = color ? color[0] : null;
+            if (!image) {
+                console.warn('O valor de "personalize-text-photo-url" está vazio');
+            }
+            if (!textPosition) {
+                console.warn('O valor de "personalize-text-photo-position" está vazio');
+            }
+            if (!color) {
+                console.warn('O valor de "personalize-text-photo-color" está vazio');
+            }
+            if (!image || !textPosition || !color) {
+                return;
+            }
+            this.textPreviewDetails = {
+                image,
+                textPosition,
+                color
+            };
             this.product = this.product[0];
             this.textMaxLength = this.product['personalize-text-photo-length'] ? this.product['personalize-text-photo-length'][0] : 15
             this.createModal();
@@ -92,8 +121,6 @@ export default class ProductPersonalization {
     }
 
     private createModal() {
-        let img = this.product['personalize-text-photo-url'][0];
-        img = img ? '/arquivos/'+img : (this.product?.items[0]?.images ?? []);
         const productImg = this.product?.items[0]?.images[0]?.imageUrl ?? '';
         const options = this.getOptionsElements();
         const $modal = $(`
@@ -104,8 +131,8 @@ export default class ProductPersonalization {
                     <div class="pnz-modal-personalization-details">
                         <div class="pnz-modal-options"></div>
                         <div class="pnz-modal-preview">
-                            <div style="background-image: url(${img})">
-                                <span class="pnz-text-content"></span>
+                            <div style="background-image: url(${this.textPreviewDetails.image})">
+                                <span class="pnz-text-content ${this.textPreviewDetails.textPosition}" style="color:${this.textPreviewDetails.color}"></span>
                             </div>
                             <p>Imagem meramente ilustrativa.</p>
                         </div>
@@ -144,20 +171,6 @@ export default class ProductPersonalization {
         </div>`);
         this.$textPersonalization = $modal.find('.pnz-modal-preview .pnz-text-content');
         $modal.find('.pnz-modal-options').append(options);
-        let $textPreview = $modal.find('.pnz-text-content');
-        let colorDefault = this.product['personalize-text-photo-color'];
-        if (colorDefault.length>0) {
-            $textPreview.css('color', colorDefault[0]);
-        }
-        let textPosition = this.product['personalize-text-photo-position'];
-        if (textPosition.length>0) {
-            textPosition = textPosition[0].toLowerCase();
-            switch (textPosition) {
-                case 'baixo':
-                    $textPreview.css('top', 'calc(50% - 10px)');
-                    break;
-            }
-        }
         const $modalBack = $(`<div class="pnz-modal-backdrop"></div>`);
         $modal.on('show', (event) => {
             event.preventDefault();

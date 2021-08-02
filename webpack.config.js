@@ -1,22 +1,22 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
+const { version, name } = require('./package.json');
 
-const prefix = 'pnz-';
 module.exports = {
-  entry: './src/scripts/index.ts',
+  entry: './src/scripts/index.js',
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: `${prefix}personalization.min.js`,
+    filename: `${name}-${version}.min.js`,
     path: path.resolve(__dirname, 'dist'),
     clean: true
   },
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: `${prefix}[name].min.css`,
+      filename: `${name}-${version}.min.css`,
     }),
   ],
   module: {
