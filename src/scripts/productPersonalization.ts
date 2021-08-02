@@ -59,7 +59,9 @@ export default class ProductPersonalization {
             if (!this.product.length) {
                 console.warn('Dados do produto não encontrados!');
                 return;
-            } else if ((this.product['personalize-text-photo-status'] && this.product['personalize-text-photo-status'][0] !== "Sim")) {
+            }
+            this.product = this.product[0];
+            if ((this.product['personalize-text-photo-status'] && this.product['personalize-text-photo-status'][0] !== "Sim")) {
                 if (this.product['personalize-text-photo-status'][0] == "Não") {
                     console.warn(`O valor de "personalize-text-photo-status" deve ser "Sim" ou "Não"`);
                 }
@@ -88,7 +90,6 @@ export default class ProductPersonalization {
                 textPosition,
                 color
             };
-            this.product = this.product[0];
             this.textMaxLength = this.product['personalize-text-photo-length'] ? this.product['personalize-text-photo-length'][0] : 15
             this.createModal();
             this.createButtonShowModal();
@@ -177,7 +178,7 @@ export default class ProductPersonalization {
             $modal.css('display', 'flex');
             $modalBack.appendTo('body');
             $modalBack.show(300);
-            $modalBack.css('opcity', .5);
+            $modalBack.css('opacity', .5);
             $modal.css('opacity', 1);
         });
         $modal.on('hide', (event) => {

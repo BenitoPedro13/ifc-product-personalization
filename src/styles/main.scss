@@ -212,6 +212,9 @@ $color-secondary: #fff;
         padding-right: 145px;
         text-align: right;
         font-size: 8px;
+        &.Baixo {
+            top: calc(50% - 10px);
+        }
     }
     span.pnz-text-content {
         font-family: $font-personalization-0;
