@@ -177,15 +177,17 @@ export default class ProductPersonalization {
             event.preventDefault();
             $modal.css('display', 'flex');
             $modalBack.appendTo('body');
-            $modalBack.show(300);
+            $modalBack.show();
             $modalBack.css('opacity', .5);
             $modal.css('opacity', 1);
         });
         $modal.on('hide', (event) => {
-            $modal.css('display', 'none');
-            $modalBack.hide(300, () => {
-                $modalBack.remove();
-            });
+            $modal.css('opacity', 1);
+            $modalBack.css('opacity', 0);
+            setTimeout(() => {
+                $modal.css('display', 'none');
+                $modalBack.remove()
+            }, 300)
         });
         $modal.appendTo('body');
         this.$modal = $modal;
