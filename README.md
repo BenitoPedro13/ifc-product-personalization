@@ -1,6 +1,6 @@
 # Personalização de produto
 ## Setup
-- Faça upload do arquivo `product-personalization-{version}.min.js` substituindo version pela versão deste módulo
+- Faça upload do arquivo `dist/ifc-product-personalization-{version}.min.js` substituindo version pela versão deste módulo
 - A chamada deste arquivo disponibilizará a classe `window.infracommerce.ProductPersonalization` que deve ser instanciada como no exemplo abaixo:
 ```
 const $productPersonalization = new window.infracommerce.ProductPersonalization({
