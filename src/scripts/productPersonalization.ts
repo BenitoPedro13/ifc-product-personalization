@@ -2,7 +2,7 @@ import { trim } from 'jquery';
 import { addToCart } from './helpers/cart';
 import { slugify } from './helpers/str';
 
-type Type = "text-to-personalization" | "radio-button" | "select" | "checkbox" | "information"
+type Type = "text-to-personalization" | "radio-button" | "select" | "checkbox" | "information" | "hidden"
 type Locale = "after" | "before" | "innerHeader" | "innerFooter"
 
 interface IOptions {
@@ -21,7 +21,7 @@ interface IButton {
 }
 
 interface IObeservers {
-    beforeAddToCart?(textElement: JQuery<HTMLElement>): void,
+    beforeAddToCart?(textElement: JQuery<HTMLElement>, productDetails: any): void,
     afterAddToCart?(): void
 }
 
@@ -53,48 +53,46 @@ export default class ProductPersonalization {
         this.observers = observers ?? null;
     }
 
-    init() {
-        document.addEventListener("DOMContentLoaded", async (event) => {
-            this.product = await this.getProductDetails();
-            if (!this.product.length) {
-                console.warn('Dados do produto não encontrados!');
-                return;
+    async init() {
+        this.product = await this.getProductDetails();
+        if (!this.product.length) {
+            console.warn('Dados do produto não encontrados!');
+            return;
+        }
+        this.product = this.product[0];
+        if ((this.product['personalize-text-photo-status'] && this.product['personalize-text-photo-status'][0] !== "Sim")) {
+            if (this.product['personalize-text-photo-status'][0] == "Não") {
+                console.warn(`O valor de "personalize-text-photo-status" deve ser "Sim" ou "Não"`);
             }
-            this.product = this.product[0];
-            if ((this.product['personalize-text-photo-status'] && this.product['personalize-text-photo-status'][0] !== "Sim")) {
-                if (this.product['personalize-text-photo-status'][0] == "Não") {
-                    console.warn(`O valor de "personalize-text-photo-status" deve ser "Sim" ou "Não"`);
-                }
-                return;
-            }
-            let image = this.product['personalize-text-photo-url'];
-            image = image ? '/arquivos/'+image[0] : null;
-            let textPosition = this.product['personalize-text-photo-position'];
-            textPosition = textPosition ? textPosition[0] : null;
-            let color = this.product['personalize-text-photo-color'];
-            color = color ? color[0] : null;
-            if (!image) {
-                console.warn('O valor de "personalize-text-photo-url" está vazio');
-            }
-            if (!textPosition) {
-                console.warn('O valor de "personalize-text-photo-position" está vazio');
-            }
-            if (!color) {
-                console.warn('O valor de "personalize-text-photo-color" está vazio');
-            }
-            if (!image || !textPosition || !color) {
-                return;
-            }
-            this.textPreviewDetails = {
-                image,
-                textPosition,
-                color
-            };
-            this.textMaxLength = this.product['personalize-text-photo-length'] ? this.product['personalize-text-photo-length'][0] : 15
-            this.createModal();
-            this.createButtonShowModal();
-            this.events();
-        })
+            return;
+        }
+        let image = this.product['personalize-text-photo-url'];
+        image = image ? '/arquivos/'+image[0] : null;
+        let textPosition = this.product['personalize-text-photo-position'];
+        textPosition = textPosition ? textPosition[0] : null;
+        let color = this.product['personalize-text-photo-color'];
+        color = color ? color[0] : null;
+        if (!image) {
+            console.warn('O valor de "personalize-text-photo-url" está vazio');
+        }
+        if (!textPosition) {
+            console.warn('O valor de "personalize-text-photo-position" está vazio');
+        }
+        if (!color) {
+            console.warn('O valor de "personalize-text-photo-color" está vazio');
+        }
+        if (!image || !textPosition || !color) {
+            return;
+        }
+        this.textPreviewDetails = {
+            image,
+            textPosition,
+            color
+        };
+        this.textMaxLength = this.product['personalize-text-photo-length'] ? this.product['personalize-text-photo-length'][0] : 15
+        this.createModal();
+        this.createButtonShowModal();
+        this.events();
     }
 
     private createButtonShowModal() {
@@ -235,13 +233,12 @@ export default class ProductPersonalization {
             return;
         }
         if (this.observers?.beforeAddToCart) {
-            this.observers?.beforeAddToCart(this.$textPersonalization);
+            this.observers?.beforeAddToCart(this.$textPersonalization, this.product);
         }
         let attachments = [{
             name: "gravacao",
             content: {
                 "gravacao": this.$textPersonalization.text(),
-                "lateralidade": this.$modal.find('[name="lateralidade"]').val() ?? "destro",
                 "posicao": this.$modal.find('[name="posicao"]').val() ?? "garrafa",
                 "tipografia": this.$modal.find('[name="tipografia"]').val() ?? "SCRIPT 412 1 LINHA"
             }

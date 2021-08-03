@@ -8,14 +8,13 @@
 export async function addToCart(id, quantity, seller, attachments) {
     let index = getItemIndex(id);
     let res;
-    if (index) {
+    if (index != false) {
         res = await vtexjs.checkout.cloneItem(index, [{ itemAttachments: attachments, quantity }]);
     } else {
         res = await vtexjs.checkout.addToCart([{ id, quantity, seller }], null, 1);
-        if (attachments) {
+        if (!res?.messages?.length && attachments) {
             await itemAddAttachments(id, attachments);
         }
-
     }
     if (res?.messages?.length) {
         return false;
@@ -25,7 +24,7 @@ export async function addToCart(id, quantity, seller, attachments) {
 
 export async function itemAddAttachments(id, attachments) {
     let index = getItemIndex(id);
-    if (index) {
+    if (index !== false) {
         let attachmentOfferingsNames = vtexjs.checkout.orderForm.items[index].attachmentOfferings.map(att => att.name);
         await attachments.map(async attachment => {
             if (attachmentOfferingsNames.includes(attachment.name)) {
@@ -43,4 +42,5 @@ export function getItemIndex(id) {
             return index;
         }
     }
+    return false;
 }
