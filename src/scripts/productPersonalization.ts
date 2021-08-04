@@ -1,6 +1,5 @@
-import { trim } from 'jquery';
 import { addToCart } from './helpers/cart';
-import { slugify } from './helpers/str';
+import { capitalizeWords, slugify } from './helpers/str';
 
 type Type = "text-to-personalization" | "radio-button" | "select" | "checkbox" | "information" | "hidden"
 type Locale = "after" | "before" | "innerHeader" | "innerFooter"
@@ -89,7 +88,7 @@ export default class ProductPersonalization {
             textPosition,
             color
         };
-        this.textMaxLength = this.product['personalize-text-photo-length'] ? this.product['personalize-text-photo-length'][0] : 15
+        this.textMaxLength = this.product['opersonalize-text-photo-length'] ? this.product['opersonalize-text-photo-length'][0] : 15
         this.createModal();
         this.createButtonShowModal();
         this.events();
@@ -240,12 +239,13 @@ export default class ProductPersonalization {
             content: {
                 "gravacao": this.$textPersonalization.text(),
                 "posicao": this.$modal.find('[name="posicao"]').val() ?? "garrafa",
-                "tipografia": this.$modal.find('[name="tipografia"]').val() ?? "SCRIPT 412 1 LINHA"
+                "tipografia": this.$modal.find('[name="tipografia"]:checked').val() ?? "SCRIPT 412 1 LINHA"
             }
         }]
         let itemId = this.product?.items[0]?.itemId;
         let sellerId = this.product?.items[0]?.sellers[0]?.sellerId ?? 1;
-        let isAdded = await addToCart(itemId, 1, sellerId, attachments);
+        let quantity = parseInt($('input.quantity-field')?.val()?.toString()) ?? 1;
+        let isAdded = await addToCart(itemId, quantity, sellerId, attachments);
         if (isAdded) {
             this.$modal.hide();
             $(".minicart").toggleClass("minicart--open");
@@ -310,6 +310,7 @@ export default class ProductPersonalization {
                     });
                     $($parentOptionType).on('keyup', 'input', function() {
                         let text = $(this).val().toString();
+                        text = capitalizeWords(text);
                         $('.pnz-text-content').text(text);
                         option.callback(text, getTextPreviewElement($(this).closest('.pnz-modal')));
                     });

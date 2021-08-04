@@ -189,10 +189,10 @@ $color-secondary: #fff;
         input[type="radio"][value="snell-roundhand"] + label {
             font-family: $font-personalization-0;
         }
-        input[type="radio"][value="snell-roundhand-black"] + label {
+        input[type="radio"][value="snell-roundhand-bold"] + label {
             font-family: $font-personalization-1;
         }
-        input[type="radio"][value="snell-roundhand-bold"] + label {
+        input[type="radio"][value="snell-roundhand-black"] + label {
             font-family: $font-personalization-2;
         }
     }
