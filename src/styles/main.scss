@@ -23,6 +23,13 @@ $font-large: 20px;
 $color-primary: #4d12a1;
 $color-secondary: #fff;
 
+/* CUSTOMIZAÇÃO */
+.produto.chivas-prod #btn-product-personalization {
+    color: white;
+    border-color: white;
+}
+/* /CUSTOMIZAÇÃO */
+
 #btn-product-personalization {
     display: block;
     font-family: $font-primary;
