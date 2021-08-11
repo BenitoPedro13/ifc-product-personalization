@@ -1,17 +1,17 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
-const { version, name } = require('./package.json');
+const { version, name } = require('../package.json');
 
 module.exports = {
-  entry: './src/scripts/index.js',
+  entry: './example/index.js',
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: `${name}-${version}.min.js`,
-    path: path.resolve(__dirname, 'dist'),
-    clean: false
+    filename: `${name}-${version}-start.min.js`,
+    path: path.resolve(__dirname, './dist'),
+    clean: true
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -40,7 +40,7 @@ module.exports = {
       },
       {
         test: /\.(sa|sc|c)ss$/,
-        exclude: /src\/fonts/,
+        exclude: /example\/fonts/,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',

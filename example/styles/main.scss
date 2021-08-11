@@ -28,7 +28,26 @@ $color-secondary: #fff;
     color: white;
     border-color: white;
 }
-/* /CUSTOMIZAÇÃO */
+/* \CUSTOMIZAÇÃO */
+
+/* TOAST */
+.personalization-toast-popup {
+    display: block;
+    position: fixed;
+    font-weight: bold;
+    top: -100%;
+    background: white;
+    width: 350px;
+    margin: 20px calc(50% - 150px);
+    padding: 15px 50px;
+    z-index: 9999;
+    box-shadow: 0 0 3px black;
+    transition: top .5s;
+    &.active {
+        top: 0;
+    }
+}
+/* \TOAST */
 
 #btn-product-personalization {
     display: block;

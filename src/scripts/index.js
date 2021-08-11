@@ -1,5 +1,4 @@
 import ProductPersonalization from './productPersonalization';
-import '../styles/main.scss'
 
 if (!window.infracommerce) {
     window.infracommerce = {};

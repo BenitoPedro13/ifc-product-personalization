@@ -20,7 +20,7 @@ interface IButton {
 }
 
 interface IObeservers {
-    beforeAddToCart?(textElement: JQuery<HTMLElement>, productDetails: any): void,
+    beforeAddToCart?(textElement: JQuery<HTMLElement>, productDetails: any): boolean,
     afterAddToCart?(): void
 }
 
@@ -232,7 +232,10 @@ export default class ProductPersonalization {
             return;
         }
         if (this.observers?.beforeAddToCart) {
-            this.observers?.beforeAddToCart(this.$textPersonalization, this.product);
+            let result = this.observers.beforeAddToCart(this.$textPersonalization, this.product);
+            if (!result) {
+                return false;
+            }
         }
         let attachments = [{
             name: "gravacao",
@@ -316,6 +319,7 @@ export default class ProductPersonalization {
                     });
                     $('#pnz-text-to-personalization-btn').on('click', function() {
                         let text = $($parentOptionType).val().toString();
+                        text = capitalizeWords(text);
                         $('.pnz-text-content').text(text);
                         option.callback(text, getTextPreviewElement($(this).closest('.pnz-modal')));
                     });

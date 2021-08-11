@@ -1,4 +1,6 @@
-const fnInitPersonalization = function($, ProductPersonalization) {
+import './styles/main.scss';
+
+const fnInitPersonalization = async function($, ProductPersonalization) {
     const $productPersonalization = new ProductPersonalization({
         btnShowModal: {
             text: 'Personalize',
@@ -44,20 +46,53 @@ const fnInitPersonalization = function($, ProductPersonalization) {
             }
         ],
         observers: {
-            beforeAddToCart: function($textElement, productDetails) {
-                $textElement.closest('.pnz-modal-dialog').find('.pnz-modal-options').append(`
-                    <input type="hidden" name="posicao" value="${productDetails['personalize-text-photo-position']}">
-                `);
+            beforeAddToCart: ($textElement, productDetails) => {
+                let text = $textElement.text();
+                let $options = $textElement.closest('.pnz-modal-dialog').find('.pnz-modal-options');
+                let personalizationBlockwords = JSON.parse(sessionStorage.getItem('personalizationBlockwords')) ?? null;
+                if (personalizationBlockwords) {
+                    let wordsBlockeds = personalizationBlockwords.filter(word => {
+                        return text.split(' ').includes(word);
+                    });
+                    if (wordsBlockeds.length > 0) {
+                        $options.find('#pnz-text-to-personalization input').val('').trigger('keyup');
+                        let $toast = $('<div class="personalization-toast-popup">Este conteúdo é impróprio, por favor, reescreva a mensagem!</div>');
+                        $toast.appendTo('body');
+                        $toast.addClass('active');
+                        setTimeout(() => {
+                            $toast.removeClass('active');
+                            setTimeout(() => {$toast.remove()}, 1000);
+                        }, 5000);
+                        return false;
+                    }
+                }
+                $options.append(`<input type="hidden" name="posicao" value="${productDetails['personalize-text-photo-position']}">`);
+                return true;
             }
         }
     });
     $productPersonalization.init();
+    if (!sessionStorage.getItem('personalizationBlockwords')) {
+        const options = {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/vnd.vtex.ds.v10+json',
+            'REST-Range': 'resources=0-3000'
+            }
+        };
+        let personalizationBlockwords = await fetch('/api/dataentities/BW/search?_fields=blockword', options)
+        .then(response => response.json().then(response => response.map(data => data.blockword)))
+        .catch(err => []);
+        sessionStorage.setItem('personalizationBlockwords', JSON.stringify(personalizationBlockwords));
+    }
     if ($('#___rc-p-id').val() === "28") {
         $('body').append('<style>.pnz-text-content{top: 84%!important}</style>');
     }
 }
+
 if (!window.jQuery || !window.infracommerce.productPersonalization) {
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
         fnInitPersonalization(window.jQuery, window.infracommerce.productPersonalization);
     });
 } else {

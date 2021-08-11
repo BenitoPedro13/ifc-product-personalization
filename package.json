@@ -1,6 +1,6 @@
 {
   "name": "ifc-product-personalization",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "keywords": [
     "VTEX",
@@ -11,6 +11,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --mode=production",
+    "example": "webpack --mode=production --config example/webpack.config.js",
     "dev": "webpack --mode=development --watch"
   },
   "devDependencies": {
