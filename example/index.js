@@ -100,6 +100,9 @@ const fnInitPersonalization = async function($, ProductPersonalization) {
         case '7141718':
             $('body').append('<style>.pnz-text-content{top: 61%!important}</style>');
             break;
+        case '32':
+            $('body').append('<style>.pnz-text-content{top: 40%!important}</style>');
+            break;
     }
     $(document).on('click', '#btn-personalization-add-to-cart', () => {
         if (!$('#pnz-terms-personalization').prop('checked')) {
