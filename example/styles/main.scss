@@ -42,7 +42,7 @@ $color-secondary: #fff;
     padding: 15px 50px;
     z-index: 9999;
     box-shadow: 0 0 3px black;
-    transition: top .5s;
+    transition: top .5s ease-in-out;
     &.active {
         top: 0;
     }

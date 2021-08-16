@@ -1,5 +1,14 @@
 import './styles/main.scss';
 
+const pnzToast = (text, time) => {
+    let $toast = $(`<div class="personalization-toast-popup">${text}</div>`);
+    $toast.appendTo('body');
+    $toast.addClass('active');
+    setTimeout(() => {
+        $toast.removeClass('active');
+        setTimeout(() => {$toast.remove()}, 1000);
+    }, time ?? 5000);
+}
 const fnInitPersonalization = async function($, ProductPersonalization) {
     const $productPersonalization = new ProductPersonalization({
         btnShowModal: {
@@ -48,6 +57,10 @@ const fnInitPersonalization = async function($, ProductPersonalization) {
         observers: {
             beforeAddToCart: ($textElement, productDetails) => {
                 let text = $textElement.text();
+                if (text.length == 0) {
+                    pnzToast('Escreva um texto para a gravação!');
+                    return false;
+                }
                 let $options = $textElement.closest('.pnz-modal-dialog').find('.pnz-modal-options');
                 let personalizationBlockwords = JSON.parse(sessionStorage.getItem('personalizationBlockwords')) ?? null;
                 if (personalizationBlockwords) {
@@ -56,13 +69,7 @@ const fnInitPersonalization = async function($, ProductPersonalization) {
                     });
                     if (wordsBlockeds.length > 0) {
                         $options.find('#pnz-text-to-personalization input').val('').trigger('keyup');
-                        let $toast = $('<div class="personalization-toast-popup">Este conteúdo é impróprio, por favor, reescreva a mensagem!</div>');
-                        $toast.appendTo('body');
-                        $toast.addClass('active');
-                        setTimeout(() => {
-                            $toast.removeClass('active');
-                            setTimeout(() => {$toast.remove()}, 1000);
-                        }, 5000);
+                        pnzToast('Este conteúdo é impróprio, por favor, reescreva a mensagem!');
                         return false;
                     }
                 }
@@ -86,9 +93,19 @@ const fnInitPersonalization = async function($, ProductPersonalization) {
         .catch(err => []);
         sessionStorage.setItem('personalizationBlockwords', JSON.stringify(personalizationBlockwords));
     }
-    if ($('#___rc-p-id').val() === "28") {
-        $('body').append('<style>.pnz-text-content{top: 84%!important}</style>');
+    switch ($('#___rc-p-id').val()) {
+        case '28':
+            $('body').append('<style>.pnz-text-content{top: 84%!important}</style>');
+            break;
+        case '7141718':
+            $('body').append('<style>.pnz-text-content{top: 61%!important}</style>');
+            break;
     }
+    $(document).on('click', '#btn-personalization-add-to-cart', () => {
+        if (!$('#pnz-terms-personalization').prop('checked')) {
+            pnzToast('Por favor, aceite os termos para prosseguir!');
+        }
+    });
 }
 
 if (!window.jQuery || !window.infracommerce.productPersonalization) {

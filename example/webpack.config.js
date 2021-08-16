@@ -1,7 +1,8 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
-const { version, name } = require('../package.json');
+const { name } = require('../package.json');
+const version = '1.3.0';
 
 module.exports = {
   entry: './example/index.js',
